@@ -3,11 +3,11 @@ class Ball {
     constructor(canvas) {
         this.x = Math.random() * canvas.width;
         this.y = 0;
-        this.radius = Math.random() * 4 + 1;
+        this.radius = Math.random() * 5;
         this.color = `hsl(${Math.random() * 360}, 100%, 75%)`;
 
         this.speed = 0;
-        this.bounce = 0.8 - ((this.radius / 5) * (Math.random() * 0.31));
+        this.bounce = 0.8 - ((this.radius / 5) * 0.31);
     } // constructor(canvas)
 
     render(context) {
