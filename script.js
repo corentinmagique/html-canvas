@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
             ball.x = mouseX;
             ball.y = mouseY;
             balls.push(ball);
-        }, 10);
+        }, 100);
     });
 
     ['mouseleave', 'mouseup'].forEach(e => {
