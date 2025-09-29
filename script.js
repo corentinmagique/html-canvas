@@ -1,3 +1,27 @@
+class Ball {
+
+    constructor(x, y, radius, color) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+
+        this.speed = Math.random() * 0.5 + 0.5;
+
+        this.xDirection = Math.random() > 0.5 ? 1 : -1;
+        this.yDirection = Math.random() > 0.5 ? 1 : -1;
+    } // constructor(x, y, radius, color)
+
+    render(context) {
+        context.beginPath();
+        context.strokeStyle = this.color || '#fff';
+        context.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+        context.stroke();
+        context.closePath();
+    } // render(context)
+
+} // class Ball
+
 document.addEventListener('DOMContentLoaded', function(e) {
     const canvas = document.getElementById('canvas');
     if (!canvas || !canvas.getContext) {
@@ -5,60 +29,36 @@ document.addEventListener('DOMContentLoaded', function(e) {
         return;
     } // if
     const context = canvas.getContext('2d');
-    // context.fillStyle = 'rgba(255, 0, 0, 0.75)';
-    // context.fillRect(0, 0, 30, 30);
 
-    // context.fillStyle = 'rgba(0, 255, 0, 0.75)';
-    // context.fillRect(30, 30, 30, 30);
+    context.fillStyle = '#0d0141ff';
+    context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // context.fillStyle = 'rgba(0, 0, 255, 0.75)';
-    // context.fillRect(15, 15, 30, 30);
+    let balls = [];
+    for (let i = 0; i < 50; i++) {
+        let ball = new Ball(
+            Math.random() * canvas.width,
+            Math.random() * canvas.height,
+            Math.random() * 4 + 1,
+            `hsl(${Math.random() * 360}, 100%, 75%)`
+        );
+        balls.push(ball);
+    } // for
 
-    // context.strokeStyle = '#fff';
-    // context.strokeRect(0, 0, 60, 60);
-
-    // context.clearRect(15, 15, 15, 15);
-    // context.clearRect(30, 30, 15, 15);
-
-    // context.beginPath();
-    // context.strokeStyle = 'rgba(0, 0, 255, 0.75)';
-    // context.arc(30, 30, 15, 0, Math.PI*2, true);
-    // context.stroke();
-    // context.fillStyle = '#fff';
-    // context.fill();
-    // context.closePath();
-
-    const count = 60;
-
-    // for (let i = 1; i <= count; i++) {
-    //     context.beginPath();
-    //     let posX = i * 10; let posY = 30;
-    //     let ratio = i / count;
-    //     console.log(i, ratio, (Math.PI*2) * ratio);
-    //     context.arc(posX, posY, 5, 0, (Math.PI*2) * ratio, false);
-    //     context.stroke();
-    //     context.closePath();
-    // } // for
-
-    let i = 1;
     function step() {
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.beginPath();
-        
-        let posX = 30; let posY = 30;
-        let ratio = i / count;
-        context.arc(posX, posY, 15, 0, (Math.PI*2) * ratio, false);
-        if (i > count + 1) {
-            i = 1;
-            context.fillStyle = `hsl(${Math.random() * 360}, 100%, 75%)`;
-            context.fill();
-        } // if
-        context.stroke();
-        context.closePath();
-        i++;
+        context.fillStyle = '#0d0141ff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        for (let star of balls) {
+            star.x += star.speed * star.xDirection;
+            star.y += star.speed * star.yDirection;
+            if (star.x - star.radius < 0) star.xDirection = 1;
+            if (star.x + star.radius > canvas.width) star.xDirection = -1;
+            if (star.y - star.radius < 0) star.yDirection = 1;
+            if (star.y + star.radius > canvas.height) star.yDirection = -1;
+            star.render(context);
+        } // for
         requestAnimationFrame(step);
     } // function step
+
     requestAnimationFrame(step);
-
-
 });
