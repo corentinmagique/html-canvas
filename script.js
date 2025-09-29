@@ -32,12 +32,32 @@ document.addEventListener('DOMContentLoaded', function(event) {
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     let balls = [];
-    for (let i = 0; i < 50; i++) {
-        balls.push(new Ball(canvas));
-    } // for
 
     let g = 9.81;
     g /= 60; // on divise par 60 pour simuler 60fps
+
+    let t = null;
+    let mouseX, mouseY;
+    canvas.addEventListener('mousemove', function(event) {
+        const {x, y} = event;
+        mouseX = x, mouseY = y;
+    });
+
+    canvas.addEventListener('mousedown', function(event) {
+        t = setInterval(function() {
+            const ball = new Ball(canvas);
+            ball.x = mouseX;
+            ball.y = mouseY;
+            balls.push(ball);
+        }, 10);
+    });
+
+    ['mouseleave', 'mouseup'].forEach(e => {
+        canvas.addEventListener(e, function() {
+            if (t) clearInterval(t);
+        });
+    });
+
     function step() {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = '#0d0141';
