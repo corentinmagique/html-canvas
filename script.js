@@ -1,28 +1,26 @@
 class Ball {
 
-    constructor(x, y, radius, color) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
+    constructor(canvas) {
+        this.x = Math.random() * canvas.width;
+        this.y = 0;
+        this.radius = Math.random() * 4 + 1;
+        this.color = `hsl(${Math.random() * 360}, 100%, 75%)`;
 
-        this.speed = Math.random() * 0.5 + 0.5;
-
-        this.xDirection = Math.random() > 0.5 ? 1 : -1;
-        this.yDirection = Math.random() > 0.5 ? 1 : -1;
-    } // constructor(x, y, radius, color)
+        this.speed = 0;
+        this.bounce = 0.8 - ((this.radius / 5) * (Math.random() * 0.31));
+    } // constructor(canvas)
 
     render(context) {
         context.beginPath();
-        context.strokeStyle = this.color || '#fff';
+        context.fillStyle = this.color || '#fff';
         context.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
-        context.stroke();
+        context.fill();
         context.closePath();
     } // render(context)
 
 } // class Ball
 
-document.addEventListener('DOMContentLoaded', function(e) {
+document.addEventListener('DOMContentLoaded', function(event) {
     const canvas = document.getElementById('canvas');
     if (!canvas || !canvas.getContext) {
         console.error('Canvas not supported!');
@@ -35,27 +33,25 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
     let balls = [];
     for (let i = 0; i < 50; i++) {
-        let ball = new Ball(
-            Math.random() * canvas.width,
-            Math.random() * canvas.height,
-            Math.random() * 4 + 1,
-            `hsl(${Math.random() * 360}, 100%, 75%)`
-        );
-        balls.push(ball);
+        balls.push(new Ball(canvas));
     } // for
 
+    let g = 9.81;
+    g /= 60; // on divise par 60 pour simuler 60fps
     function step() {
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = '#0d0141ff';
+        context.fillStyle = '#0d0141';
         context.fillRect(0, 0, canvas.width, canvas.height);
-        for (let star of balls) {
-            star.x += star.speed * star.xDirection;
-            star.y += star.speed * star.yDirection;
-            if (star.x - star.radius < 0) star.xDirection = 1;
-            if (star.x + star.radius > canvas.width) star.xDirection = -1;
-            if (star.y - star.radius < 0) star.yDirection = 1;
-            if (star.y + star.radius > canvas.height) star.yDirection = -1;
-            star.render(context);
+        for (let ball of balls) {
+            ball.speed += g;
+            ball.speed *= 0.99; // friction
+            ball.y += ball.speed;
+            let groundY = canvas.height - ball.radius;
+            if (ball.y > groundY) {
+                ball.y = groundY;
+                ball.speed = -ball.speed * ball.bounce;
+            } // if ... else
+            ball.render(context);
         } // for
         requestAnimationFrame(step);
     } // function step
