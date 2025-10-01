@@ -3,7 +3,7 @@ class Ball {
     constructor(canvas) {
         this.x = Math.random() * canvas.width;
         this.y = 0;
-        this.radius = Math.random() * 5;
+        this.radius = 5;
         this.color = `hsl(${Math.random() * 360}, 100%, 75%)`;
 
         this.speed = 0;
@@ -58,10 +58,70 @@ document.addEventListener('DOMContentLoaded', function(event) {
         });
     });
 
+    for (let i = 0; i < 1; i++) {
+        const ball = new Ball(canvas);
+        ball.x = 386;
+        ball.y = 386;
+        balls.push(ball);
+    } // for
+    
     function step() {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = '#0d0141';
         context.fillRect(0, 0, canvas.width, canvas.height);
+
+        const cellSize = 50;
+        let grid = [];
+        for (let i = 0; i <= canvas.width / cellSize; i++) {
+            for (let j = 0; j <= canvas.height / cellSize; j++) {
+                if (!grid[i]) grid[i] = [];
+                grid[i][j] = [];
+            } // for
+        } // for
+
+        for (let ball of balls) {
+            for (let i = 1; i < grid.length; i++) {
+                let found = false;
+                if (ball.x - ball.radius >= (i - 1) * cellSize && ball.x + ball.radius <= i * cellSize) {
+                    for (let j = 1; j < grid[i].length; j++) {
+                        if (ball.y - ball.radius >= (j - 1) * cellSize && ball.y + ball.radius <= j * cellSize) {
+                            grid[i-1][j-1].push(ball);
+                            found = true;
+                            break;
+                        } // if
+                    } // for
+                } // if
+                if (found) break;
+            } // for
+        } // for
+
+        // Debug affichage grille
+        for (let i = 0; i < grid.length; i++) {
+            context.beginPath();
+            context.strokeStyle = 'rgba(255, 0, 0, 0.26)';
+            context.moveTo(i * 50, 0);
+            context.lineTo(i * 50, canvas.height);
+            context.moveTo(0, i * 50);
+            context.lineTo(canvas.width, i * 50);
+            context.stroke();
+            context.closePath();
+
+            for (let j = 0; j < grid[i].length; j++) {
+                let currentCell = grid[i][j];
+                if (currentCell.length > 0) {
+                    context.fillStyle = '#da2afd18';
+                    context.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                    for (let dx = -1; dx < 2;dx++) {
+                        for (let dy = -1; dy < 2;dy++) {
+                            console.log(i, j)
+                            context.fillRect((i+dx) * cellSize, (i+dy) * cellSize, cellSize, cellSize);
+                        } // for
+                    } // for
+                } // if
+            } // for
+
+        } // for
+
         for (let ball of balls) {
             ball.speed += g;
             ball.speed *= 0.99; // friction
@@ -73,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
             } // if ... else
             ball.render(context);
         } // for
-        requestAnimationFrame(step);
+        // requestAnimationFrame(step);
     } // function step
 
     requestAnimationFrame(step);
