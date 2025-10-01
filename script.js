@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
     for (let i = 0; i < 1; i++) {
         const ball = new Ball(canvas);
-        ball.x = 386;
+        ball.x = 245;
         ball.y = 386;
         balls.push(ball);
     } // for
@@ -113,13 +113,12 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     context.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
                     for (let dx = -1; dx < 2;dx++) {
                         for (let dy = -1; dy < 2;dy++) {
-                            console.log(i, j)
-                            context.fillRect((i+dx) * cellSize, (i+dy) * cellSize, cellSize, cellSize);
+                            let idx = i+dx, jdy = j+dy;
+                            context.fillRect(idx * cellSize, jdy * cellSize, cellSize, cellSize);
                         } // for
                     } // for
                 } // if
             } // for
-
         } // for
 
         for (let ball of balls) {
@@ -133,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
             } // if ... else
             ball.render(context);
         } // for
-        // requestAnimationFrame(step);
+        requestAnimationFrame(step);
     } // function step
 
     requestAnimationFrame(step);
