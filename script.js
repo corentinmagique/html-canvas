@@ -57,13 +57,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
             if (t) clearInterval(t);
         });
     });
-
-    for (let i = 0; i < 1; i++) {
-        const ball = new Ball(canvas);
-        ball.x = 245;
-        ball.y = 386;
-        balls.push(ball);
-    } // for
     
     function step() {
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -71,27 +64,29 @@ document.addEventListener('DOMContentLoaded', function(event) {
         context.fillRect(0, 0, canvas.width, canvas.height);
 
         const cellSize = 50;
-        let grid = [];
-        for (let i = 0; i <= canvas.width / cellSize; i++) {
-            for (let j = 0; j <= canvas.height / cellSize; j++) {
-                if (!grid[i]) grid[i] = [];
+
+        const cols = Math.ceil(canvas.width / cellSize);
+        const rows = Math.ceil(canvas.height / cellSize);
+
+        let grid = {};
+        for (let i = 0; i < cols; i++) {
+            for (let j = 0; j < rows; j++) {
+                if (!grid[i]) grid[i] = {};
                 grid[i][j] = [];
             } // for
         } // for
 
         for (let ball of balls) {
-            for (let i = 1; i < grid.length; i++) {
-                let found = false;
-                if (ball.x - ball.radius >= (i - 1) * cellSize && ball.x + ball.radius <= i * cellSize) {
-                    for (let j = 1; j < grid[i].length; j++) {
-                        if (ball.y - ball.radius >= (j - 1) * cellSize && ball.y + ball.radius <= j * cellSize) {
-                            grid[i-1][j-1].push(ball);
-                            found = true;
-                            break;
-                        } // if
-                    } // for
-                } // if
-                if (found) break;
+            const minX = Math.floor((ball.x - ball.radius) / cellSize);
+            const maxX = Math.floor((ball.x + ball.radius) / cellSize);
+            const minY = Math.floor((ball.y - ball.radius) / cellSize);
+            const maxY = Math.floor((ball.y + ball.radius) / cellSize);
+
+            for (let x = Math.max(0, minX); x <= Math.min(cols-1, maxX);x++) {
+                for (let y = Math.max(0, minY); y <= Math.min(rows-1, maxY);y++) {
+                    console.log(x, y)
+                    grid[x][y].push({x, y});
+                } // for
             } // for
         } // for
 
@@ -105,16 +100,20 @@ document.addEventListener('DOMContentLoaded', function(event) {
             context.lineTo(canvas.width, i * 50);
             context.stroke();
             context.closePath();
-
+            
             for (let j = 0; j < grid[i].length; j++) {
                 let currentCell = grid[i][j];
                 if (currentCell.length > 0) {
                     context.fillStyle = '#da2afd18';
-                    context.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
                     for (let dx = -1; dx < 2;dx++) {
                         for (let dy = -1; dy < 2;dy++) {
+                            if (dx == 0 && dy == 0) continue;
                             let idx = i+dx, jdy = j+dy;
-                            context.fillRect(idx * cellSize, jdy * cellSize, cellSize, cellSize);
+                            if (grid[idx][jdy] && grid[idx][jdy].length > 0) {
+                                for (let b of grid[idx][jdy]) {
+                                    b.color = "red";
+                                } // for
+                            } // if
                         } // for
                     } // for
                 } // if
